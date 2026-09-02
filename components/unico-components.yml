@@ -1,0 +1,63 @@
+generated: '2026-09-02'
+method: searched
+source: https://developer.unico.io/developers/sdks-and-tools/overview
+note: >-
+  Unico's client-side surface is a capture experience, not a UI kit. Three delivery modes are
+  published, and the choice between them is the same decision as the choice of REST contract:
+  who owns the camera.
+families:
+- family: Hosted journey
+  description: >-
+    Unico hosts the whole verification journey. The integrator creates a process and receives
+    a userRedirectUrl; the user is sent there by iFrame or full redirect and returns via
+    callbackUri.
+  delivery: [iframe, redirect]
+  contract: Web & SDK
+  customization:
+    portal: https://developer.unico.io/product-guide/portal-idcloud/settings/journey-customization
+    note: Journey appearance is configured in the IDCloud portal, not in code.
+- family: Web capture frame
+  description: >-
+    In-page biometric capture component. Opens the camera, runs framing and liveness guidance
+    in the browser, and returns an encrypted capture the integrator posts to the API.
+  loader: unico-webframe
+  registry: npm
+  version: 3.27.0
+  published: '2026-08-31'
+  docs: https://developer.unico.io/developers/sdks-and-tools/web/web-sdk/api-reference/capture-api
+  customization_api: https://developer.unico.io/developers/sdks-and-tools/web/web-sdk/api-reference/customization-api
+- family: Native capture SDKs
+  description: >-
+    Embedded capture views for mobile applications, with on-device smart capture and liveness.
+  platforms:
+  - platform: Android
+    package: com.acesso:acessobio-android
+    version: 6.10.0
+  - platform: iOS
+    package: unicocheck-ios
+    version: 3.1.0
+  - platform: Flutter
+    package: unico_check
+    version: 4.58.0
+  customization_apis:
+  - https://developer.unico.io/developers/sdks-and-tools/android/api-reference/customization-api
+  - https://developer.unico.io/developers/sdks-and-tools/ios/api-reference/customization-api
+  - https://developer.unico.io/developers/sdks-and-tools/flutter/api-reference/customization-api
+- family: QR code handoff
+  description: >-
+    Desktop-to-mobile handoff — the journey is continued on a phone by scanning a QR code.
+    Surfaces in the webhook event stream as EVENT_TYPE_QR_CODE_READ.
+  configuration: https://developer.unico.io/product-guide/portal-idcloud/settings/qr-code
+not_supported:
+- framework: React Native
+  note: Explicitly listed as not supported on the SDKs and Tools overview.
+sample_apps:
+  frameworks: [Angular, React, Vue, Next.js]
+  note: >-
+    Published as proof-of-concept implementations rather than supported distributions.
+  source: https://developer.unico.io/developers/sdks-and-tools/overview
+capture_standard:
+  url: https://developer.unico.io/developers/sdks-and-tools/capture-standard
+  note: >-
+    Technical requirements a proprietary capture stack must meet when the integrator does not
+    use a Unico SDK — minimum 640x480, max 800KB, PNG/JPEG/WebP.

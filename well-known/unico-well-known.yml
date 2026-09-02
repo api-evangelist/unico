@@ -1,0 +1,124 @@
+generated: '2026-09-02'
+method: probed
+source: https://developer.unico.io/developers/api-reference/environments
+note: >-
+  Every host named in Unico's own Environments page was probed anonymously for the five
+  canonical /.well-known/ paths on 2026-09-02. Three hosts serve a real security.txt and one
+  serves a real OpenID Connect discovery document. identity.acesso.io is Unico's own OAuth2
+  token host — Unico's Environments and Authentication pages name it as the production
+  token endpoint for every IDCloud contract (the acesso.io domain is the company's former
+  Acesso Digital identity, retained for the identity plane).
+  identity.acesso.io answers every unmatched /.well-known/* path with a 302 to its login,
+  so only the 200 documents below are treated as served.
+hosts:
+- host: developer.unico.io
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    file: unico-security.txt
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: identity.acesso.io
+  documents:
+  - path: /.well-known/openid-configuration
+    status: 200
+    file: unico-openid-configuration.json
+  - path: /.well-known/security.txt
+    status: 200
+    file: unico-api-security.txt
+  - path: /.well-known/oauth-authorization-server
+    status: 302
+    note: redirect to login; not a served metadata document
+  - path: /.well-known/api-catalog
+    status: 302
+    note: redirect to login; not a served document
+  - path: /.well-known/ai-plugin.json
+    status: 302
+  - path: /.well-known/agent-card.json
+    status: 302
+  - path: /.well-known/agent.json
+    status: 302
+- host: api.id.unico.app
+  documents:
+  - path: /.well-known/security.txt
+    status: 200
+    file: unico-api-security.txt
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: api.idcloud.unico.app
+  documents:
+  - path: /.well-known/security.txt
+    status: 500
+    note: Apigee gateway returns messaging.runtime.RouteFailed for any unrouted path
+  - path: /.well-known/openid-configuration
+    status: 500
+  - path: /.well-known/oauth-authorization-server
+    status: 500
+  - path: /.well-known/api-catalog
+    status: 500
+  - path: /.well-known/ai-plugin.json
+    status: 500
+  - path: /.well-known/agent-card.json
+    status: 500
+  - path: /.well-known/agent.json
+    status: 500
+- host: www.unico.io
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: devcenter.unico.io
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+summary:
+  hosts_probed: 6
+  paths_per_host: 7
+  documents_served: 4
+  security_txt: true
+  openid_configuration: true
+  api_catalog: false
+  agent_card: false

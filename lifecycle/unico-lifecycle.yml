@@ -1,0 +1,60 @@
+generated: '2026-09-02'
+method: searched
+source: https://developer.unico.io/developers/api-reference/
+status_page:
+  published: true
+  url: https://status.unico.io
+  http_status: 200
+  provider: self-hosted
+  history_published: unknown
+  note: >-
+    Linked from the site footer, the developer portal footer and the Certifications page.
+versioning:
+  scheme: uri-path
+  current: v1
+  sdk_scheme: semver
+  sdk_statement: >-
+    "We use semantic versioning to number our versions." Stated on every SDK release-notes page.
+  note: >-
+    The REST path version has not moved off v1. Capability behaviour is versioned by API key
+    instead: adding Identity Verification to an existing contract changes the result
+    vocabulary on the same v1 path and requires the key to be reissued. An integrator watching
+    only the URL version would miss a breaking change to the response semantics.
+  evidence: https://developer.unico.io/developers/api-reference/api/upgrade-guide
+deprecation_policy:
+  published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  note: >-
+    No deprecation policy page, no notice period, and no RFC 8594 Sunset/Deprecation headers
+    are documented. Deprecation IS practised — `referenceProcessId` is marked "Deprecated. Use
+    `references` instead." on the Create Process page, and the Web redirect integration is
+    published at a path literally ending `/redirect-deprecated` — but there is no published
+    rule for how long a deprecated field keeps working or how integrators are told.
+  deprecated_items:
+  - item: referenceProcessId (Create Process, Transactional product)
+    replacement: references[]
+    source: https://developer.unico.io/developers/api-reference/api/post-processes
+    sunset_date: null
+  - item: Web redirect integration (Card not present verification)
+    source: https://developer.unico.io/developers/regional-solutions/card-not-present-verification/integration/controlling-the-experience/web/redirect-deprecated
+    sunset_date: null
+sla:
+  published: false
+  note: >-
+    No public SLA or uptime commitment. The Certifications page states "150M+ transactions per
+    month without performance degradation" as a capability claim, not a contractual target.
+support:
+  help_center: https://developer.unico.io/resources/faq
+  contact: https://www.unico.io/contact-us
+  model: >-
+    Named CS / Onboarding team per tenant. Rate-limit increases, capability enablement,
+    by-client webhook registration and backtests all route through that team rather than
+    self-service.
+retention:
+  note: >-
+    A retention policy exists and is observable in the contract: document fetch endpoints
+    return 410 Gone once a resource has been deleted under it. The policy's actual window is
+    not published in the developer docs.
+  source: https://developer.unico.io/developers/api-reference/error-codes

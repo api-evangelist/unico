@@ -1,0 +1,125 @@
+# Unico
+
+> Unico (unico IDtech) is a Brazilian identity-technology company whose IDCloud platform
+> performs facial-biometric identity verification, liveness detection, document capture and
+> fraud-risk decisioning for onboarding, step-up authentication and card-not-present
+> verification. Its public API surface is two REST contracts plus an outbound webhook.
+>
+> generated: 2026-09-02
+> method: generated
+> source: apis.yml + this repository's artifacts (developer.unico.io reference,
+>   identity.acesso.io OpenID discovery, published Postman collections)
+> note: Unico serves no llms.txt on its primary docs host (developer.unico.io/llms.txt -> 404).
+>   It does serve one on its GitBook DevHub (devcenter.unico.io/llms.txt -> 200), saved
+>   verbatim alongside this file as unico-devcenter-llms.txt; that file indexes a single page.
+>   What Unico DOES ship for agents is a Markdown twin of every documentation page: append
+>   `.md` to any developer.unico.io URL and the raw Markdown source is returned
+>   (Content-Type: text/markdown). Their own example cites docs.unico.io, which does not
+>   resolve — use developer.unico.io.
+
+## Start here
+
+- [API Reference overview](https://developer.unico.io/developers/api-reference/): the two
+  contracts and how to choose between them.
+- [Environments](https://developer.unico.io/developers/api-reference/environments): sandbox
+  and production hosts for every contract.
+- [Authentication](https://developer.unico.io/developers/api-reference/authentication):
+  OAuth2 with the RFC 7523 JWT-bearer grant, RS256, 1-hour tokens.
+- [Flows](https://developer.unico.io/developers/api-reference/api/flows): the capability
+  recipes an APIKEY can run and the result values each returns.
+
+## Contracts
+
+### API (TCA / Check.Integration) — the client owns capture
+Production host: https://api.id.unico.app — Sandbox: https://api.id.uat.unico.app
+Headers: `Authorization: Bearer <jwt>` AND `APIKEY: <provisioned key>`
+
+- POST /processes/v1 — create a verification process, image sent as `imageBase64`; result returns synchronously
+- GET /processes/v1/{id} — retrieve a process
+- GET /processes/v1/{id}/document — retrieve a document (410 Gone once retention expires)
+- GET /documents — check for a reusable document before capturing a new one
+- GET /lists — registration data, PEP/AML screening, sports relationship (Brazil, by CPF)
+- POST /processes/age-validation — age verification
+
+### Web & SDK — Unico hosts the journey
+Production host: https://api.idcloud.unico.app — Sandbox: https://api.idcloud.uat.unico.app
+Header: `Authorization: Bearer <jwt>` only
+
+- POST /client/v1/process — create the journey; returns `userRedirectUrl` and an SDK token
+- GET /client/v1/process/{id} — retrieve the result
+
+### OAuth2 token service
+Production: https://identity.acesso.io — Sandbox: https://identityhomolog.acesso.io
+(The acesso.io domain is Unico's own; it is the company's former Acesso Digital identity,
+retained for the identity plane and named as the token host in Unico's Environments page.)
+
+- POST /oauth2/token — grant_type urn:ietf:params:oauth:grant-type:jwt-bearer, assertion signed RS256
+- GET /.well-known/openid-configuration — live OpenID Connect discovery document
+
+## Things an agent must know before calling this API
+
+- **A 200 is not an approval.** The verification verdict lives in the response body, under a
+  different field per contract: `process.result`, `process.authenticationInfo.livenessResult`
+  (Web & SDK), `liveness`, `unicoId.result` (API). Branching on status code alone reads every
+  rejection as a success.
+- **There is no idempotency key.** Unico states plainly that creation endpoints expose no
+  idempotency mechanism. A retried POST creates a second billable verification of a real
+  person. Correlate on your own `clientReference` and retrieve before retrying.
+- **There is no reversal.** No cancel, void, undo or delete operation is published for any
+  endpoint. Process creation is irreversible.
+- **Capabilities are bound to the API key, not the URL.** Adding Identity Verification to an
+  existing contract changes the result vocabulary on the same `/v1` path and requires the key
+  to be reissued. Watching the path version will not surface it.
+- **Three enum families, not interchangeable:** `PROCESS_STATE_*` (webhook state),
+  `PROCESS_RESULT_*` (GetProcess), `EVENT_TYPE_*` (webhook lastEvent).
+- **Rate limit:** 10 RPS per tenant by default; 429 with a `Retry-After` header. No
+  `X-RateLimit-*` headers. Cache the access token for its full hour; do not poll GetProcess.
+
+## Webhooks
+
+- [Webhooks and Events](https://developer.unico.io/developers/webhooks-and-events/) — at-least-once
+  delivery of a terminal `PROCESS_STATE_FINISHED` notification. The payload carries no outcome;
+  fetch it with GetProcess. Your endpoint must be idempotent on `processId`. No payload
+  signature is published — Unico authenticates TO your endpoint (OAuth2, Basic, or API key),
+  not the other way round.
+
+## SDKs
+
+Capture SDKs only — they open the camera and return an encrypted capture. There is no
+first-party server-side client in any language.
+
+- Web: `unico-webframe` 3.27.0 (npm, 2026-08-31)
+- Android: `com.acesso:acessobio-android` 6.10.0 (self-hosted at https://maven-sdk.unico.run/sdk-mobile, not Maven Central)
+- iOS: `unicocheck-ios` 3.1.0 (CocoaPods, 2026-08-18; also SPM from github.com/acesso-io/unico-check-ios)
+- Flutter: `unico_check` 4.58.0 (pub.dev, 2026-08-19)
+
+## Machine-readable material
+
+- No OpenAPI. The developer portal's own OpenAPI page
+  (https://developer.unico.io/api/unico-api) reads "Placeholder OpenAPI specification."
+- No AsyncAPI, no GraphQL, no gRPC/protobuf, no WSDL.
+- Postman collections (published, HTTP 200):
+  - https://developer.unico.io/postman/oauth2.postman_collection.json
+  - https://developer.unico.io/postman/api-integration.postman_collection.json
+  - https://developer.unico.io/postman/web-sdk-integration.postman_collection.json
+- security.txt on developer.unico.io, api.id.unico.app, identity.acesso.io — public HackerOne
+  program at https://hackerone.com/unico_idtech
+- No /.well-known/api-catalog, no agent card, no MCP server.
+
+## Reference
+
+- Rate limits: https://developer.unico.io/developers/api-reference/rate-limits
+- Error codes: https://developer.unico.io/developers/api-reference/error-codes
+- Postman: https://developer.unico.io/developers/api-reference/postman
+- Capabilities: https://developer.unico.io/capabilities
+- Product guide: https://developer.unico.io/product-guide/
+- FAQ: https://developer.unico.io/resources/faq
+- Glossary: https://developer.unico.io/resources/glossary
+- Status: https://status.unico.io
+- Certifications & Standards: https://www.unico.io/platforms/security-compliance
+
+## Optional
+
+- AI agent integration (Markdown twins): https://developer.unico.io/developers/llms
+- Backtests (SFTP historical simulation, sales-mediated): https://developer.unico.io/resources/backtests
+- Reprocessing / biometric base import: https://developer.unico.io/resources/reprocessing

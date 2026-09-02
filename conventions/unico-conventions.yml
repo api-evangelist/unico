@@ -1,0 +1,138 @@
+generated: '2026-09-02'
+method: searched
+source: https://developer.unico.io/developers/api-reference/
+docs: https://developer.unico.io/developers/api-reference/
+note: >-
+  Cross-cutting runtime semantics for the Unico IDCloud platform, read from the published
+  API reference. Unico publishes no OpenAPI, so nothing here is derived from a spec; every
+  claim carries the docs URL it came from.
+auth:
+  style: oauth2-jwt-bearer + api-key
+  header: 'Authorization: Bearer <access_token>'
+  second_header: 'APIKEY: <provisioned key>  # API contract only'
+  token_ttl_seconds: 3600
+  detail: authentication/unico-authentication.yml
+  source: https://developer.unico.io/developers/api-reference/authentication
+idempotency:
+  supported: false
+  header: null
+  scope: null
+  retention: null
+  statement: >-
+    "The IDCloud platform does not currently expose an idempotency-key mechanism on creation
+    endpoints." Unico's own guidance is to be cautious retrying POST /client/v1/process or
+    POST /processes/v1, because a network error on a 5xx may have succeeded server-side and a
+    retry would create a duplicate process.
+  workaround: >-
+    Correlate on your own identifier before retrying. The Web & SDK contract accepts
+    person.clientReference and the API contract accepts subject.clientReference (a unique,
+    max-256-character identifier in the integrator's own base) — that field, plus a
+    retrieve-before-retry step, is the only duplicate-suppression mechanism available.
+  source: https://developer.unico.io/developers/api-reference/error-codes#retry-policy
+  agent_impact: >-
+    An agent must not blind-retry a process creation. There is no server-side dedupe, and each
+    duplicate is a billable verification against a real person's biometrics.
+pagination:
+  supported: false
+  note: >-
+    Every documented read is a single-resource GET by process id, or a single-subject query.
+    No list endpoint with a cursor, page or offset parameter is published.
+field_expansion:
+  supported: false
+metadata:
+  supported: partial
+  fields:
+  - name: useCase
+    description: Free-text operation context, e.g. "Onboarding", "Transactional".
+  - name: subsidiaryId
+    description: Branch identifier; required only when the tenant has multiple branches.
+  - name: subject.clientReference
+    description: >-
+      The integrator's own unique identifier for the user. Required for the Multi Accounts
+      capability. Max 256 characters, no spaces.
+request_id_tracing:
+  supported: unknown
+  note: >-
+    No request-id or correlation header is documented. When escalating a 5xx, Unico asks for
+    the response body and the timestamp rather than a trace identifier — which is itself the
+    evidence that no per-request id is surfaced.
+versioning:
+  style: uri-path
+  examples:
+  - POST https://api.id.unico.app/processes/v1
+  - GET https://api.idcloud.unico.app/client/v1/process/{id}
+  current_major: v1
+  note: >-
+    The version lives in the path segment. Capability behaviour, however, is versioned by
+    API key, not by URL: adding Identity Verification to an existing Fraud Risk Classification
+    contract changes the result vocabulary returned on the SAME v1 path and requires the key
+    to be reissued.
+  source: https://developer.unico.io/developers/api-reference/api/upgrade-guide
+error_envelope:
+  format: vendor
+  rfc9457: false
+  detail: errors/unico-problem-types.yml
+  critical: >-
+    The verification verdict is carried in the 200 body, not in the status code. See
+    errors/unico-problem-types.yml#soft_failures.
+rate_limit_signal:
+  header: Retry-After
+  status: 429
+  standard_headers: false
+  detail: rate-limits/unico-rate-limits.yml
+status_vocabularies:
+  warning: >-
+    Three distinct enum families exist and are explicitly NOT interchangeable.
+  families:
+  - prefix: PROCESS_STATE_*
+    used_by: webhook payload `state`
+  - prefix: PROCESS_RESULT_*
+    used_by: GetProcess `result` / `status` (Web & SDK)
+  - prefix: EVENT_TYPE_*
+    used_by: webhook payload `lastEvent`
+  guidance: >-
+    Unico instructs integrators to treat these as evolvable configuration — react only to
+    values you explicitly handle, log unknown values, and do not error on them. New states may
+    be added without a major version change.
+  source: https://developer.unico.io/developers/webhooks-and-events/event-types
+async_delivery:
+  mechanism: webhook
+  guarantee: at-least-once
+  consumer_requirement: the receiving endpoint MUST be idempotent on processId
+  detail: asyncapi/unico-webhooks.yml
+dry_run_mode:
+  supported: partial
+  form: separate sandbox environment
+  note: >-
+    Sandbox hosts mirror the production contract exactly (same endpoints, same payloads) with
+    separate credentials, test-only biometric data and periodically reset persistence. There
+    is no in-request dry_run / simulate flag on the production hosts. A historical-simulation
+    facility ("backtests") exists but is sales-mediated and runs over SFTP, not the API.
+  source: https://developer.unico.io/developers/api-reference/environments
+reversibility:
+  grade: absent
+  write_surface: true
+  reversal_operations: []
+  note: >-
+    Unico's public reference documents no cancel, void, undo, reverse, delete or restore
+    operation on any published endpoint. A verification process, once created, is terminal:
+    the only documented lifecycle end-state besides completion is expiry
+    (EVENT_TYPE_SESSION_ENDED) and, later, deletion by Unico's own retention policy — which
+    surfaces to the caller as 410 Gone on document fetch, not as an operation the caller can
+    invoke.
+  window: null
+  window_source: null
+  agent_impact: >-
+    Combined with the absent idempotency key, this means a process creation an agent fires is
+    both non-deduplicated and non-retractable. There is no published path to undo a duplicate,
+    a wrongly-targeted subject, or a submission made with the wrong APIKEY. The correct
+    posture is to treat POST /processes/v1 and POST /client/v1/process as irreversible and to
+    confirm before firing.
+  caveat: >-
+    Data-subject deletion certainly exists as a contractual/LGPD-GDPR obligation, but it is
+    not published as an API operation, so it is not recorded here as one.
+  checked_sources:
+  - https://developer.unico.io/developers/api-reference/api/
+  - https://developer.unico.io/developers/api-reference/error-codes
+  - https://developer.unico.io/developers/webhooks-and-events/
+  - https://developer.unico.io/developers/api-reference/api/post-processes

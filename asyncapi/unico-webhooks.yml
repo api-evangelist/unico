@@ -1,0 +1,139 @@
+generated: '2026-09-02'
+method: searched
+source: https://developer.unico.io/developers/webhooks-and-events/
+docs: https://developer.unico.io/developers/webhooks-and-events/
+asyncapi_spec_published: false
+asyncapi_probe:
+  note: >-
+    No AsyncAPI document is published. /asyncapi.yaml and /asyncapi.json were not served on
+    any Unico host, the developer.unico.io sitemap (184 URLs) names no event-schema file, and
+    the GitHub org github.com/unico-id has no public repositories. What Unico DOES publish is
+    a complete prose webhook reference, captured verbatim below.
+surface: webhooks
+transport: HTTPS POST
+direction: unico -> integrator
+delivery_guarantee: at-least-once
+consumer_must_be_idempotent: true
+terminal_only: true
+terminal_note: >-
+  Webhooks fire only at terminal state. No intermediate progress events are delivered, even
+  for long-running flows combining document analysis and manual review.
+modalities:
+- name: Via Portal
+  applies_to: Web & SDK integrations
+  configuration: self-service, IDCloud portal > Settings > Webhook
+  availability: general
+- name: By client
+  applies_to: API integrations using the Check orchestration capability
+  configuration: configured by the Unico CS / Onboarding team
+  availability: Brazil only
+registration_fields:
+- field: Notification URL
+  description: HTTPS endpoint Unico calls to deliver notifications.
+- field: Authentication type
+  description: How Unico authenticates to the integrator's endpoint.
+- field: Retry settings
+  description: Maximum attempts and interval; exponential backoff is applied.
+- field: Concurrency limit
+  description: Maximum simultaneous in-flight deliveries. Max 500.
+- field: Timeout
+  description: Maximum wait for the endpoint's response, in seconds.
+- field: Status to notify
+  description: Fixed to PROCESS_STATE_FINISHED; not currently configurable.
+outbound_authentication:
+- method: oauth2
+  inputs: [endpoint, provider URL, ClientId, Secret]
+  behavior: >-
+    Unico requests an access token from the provider URL with the client credentials and
+    forwards it to the endpoint as a Bearer token.
+- method: basic
+  inputs: ['user:pass']
+  behavior: 'Base64-encoded and sent as Authorization: Basic <encoded> on every call.'
+- method: api-key
+  inputs: ['header:value', 'value']
+  behavior: >-
+    The configured string is split on the FIRST colon. "X-API-Key:abc123" becomes the header
+    X-API-Key: abc123; "Authorization:Bearer abc123" becomes Authorization: Bearer abc123; a
+    value with no colon is sent as the Authorization header with no scheme prefix.
+- method: none
+  behavior: No credentials sent. Documented as development-only.
+signature_verification:
+  published: false
+  note: >-
+    Unico does not publish an HMAC signature header for webhook payloads. Authenticity is
+    established by the credentials Unico presents TO the integrator's endpoint (above), not by
+    a signature over the body. An integrator cannot verify a payload's origin cryptographically.
+channels:
+- channel: process-state-change
+  operation: receive
+  states:
+  - name: PROCESS_STATE_FINISHED
+    description: Process finished — terminal state, regardless of outcome.
+  payload:
+    processId:
+      type: string
+      format: uuid
+      description: ID of the transaction.
+    state:
+      type: string
+      description: 'Current state. Currently only: PROCESS_STATE_FINISHED.'
+    flow:
+      type: string
+      description: Flow executed for this transaction, e.g. `id`, `idtoken`.
+    lastEvent:
+      type: string
+      description: >-
+        Last event of the transaction. Returned ONLY when the process expired before the user
+        completed the flow.
+    lastEventDescription:
+      type: string
+      description: Human-readable description of lastEvent. Same conditional presence.
+  example:
+    processId: 8263a268-5388-492a-bca2-28e1ff4a69f0
+    state: PROCESS_STATE_FINISHED
+    flow: id
+event_types:
+- name: EVENT_TYPE_PROCESS_CREATED
+  description: Process created
+- name: EVENT_TYPE_QR_CODE_READ
+  description: QR code was read
+- name: EVENT_TYPE_PROCESS_STARTED_BY_USER
+  description: Process started by user
+- name: EVENT_TYPE_IDENTITY_VALIDATION_STEP_FINISHED
+  description: Identity validation step finished
+- name: EVENT_TYPE_DOCUMENT_STEP_STARTED
+  description: Document step has started
+- name: EVENT_TYPE_DOCUMENT_PHOTO_CAPTURED
+  description: Photo of the document taken
+- name: EVENT_TYPE_DOCUMENT_UPLOADED_FROM_GALLERY
+  description: Document uploaded from gallery
+- name: EVENT_TYPE_DOCUMENT_STEP_FINISHED
+  description: Document step finished
+- name: EVENT_TYPE_SESSION_ENDED
+  description: Session ended by timeout or by new session created
+- name: EVENT_TYPE_ERROR_ON_DOCUMENT_STEP
+  description: Error on document step
+event_count: 10
+response_contract:
+  success: any 2xx
+  failure: any non-2xx triggers retry with exponential backoff up to the configured maximum
+  guidance: >-
+    Acknowledge fast and process asynchronously. Sustained non-2xx responses cause Unico to
+    automatically reduce delivery throughput to that endpoint; for planned maintenance,
+    Unico advises stopping intake at the load balancer rather than returning 503.
+fallback:
+  mechanism: GetProcess polling
+  note: >-
+    The webhook payload signals only that a process finished; it carries no outcome. The
+    result is retrieved from GET /processes/v1/{id} (API contract) or
+    GET /client/v1/process/{id} (Web & SDK contract). Webhooks complement, not replace, those.
+  source: https://developer.unico.io/developers/webhooks-and-events/fallback
+magic_link_note:
+  scope: Magic Link (Mexico) only
+  cors_origins:
+    sandbox: https://verification.uat.unico.app
+    production: https://verification.unico.app
+  delivery_deadline: >-
+    The webhook server is expected to respond within 1 minute; slower responses are dropped
+    (the user's process is unaffected).
+  source: https://developer.unico.io/developers/api-reference/rate-limits

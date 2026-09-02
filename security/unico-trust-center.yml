@@ -1,0 +1,35 @@
+generated: '2026-09-02'
+method: searched
+source: https://www.unico.io/platforms/security-compliance
+trust_center:
+  name: Certifications & Standards
+  url: https://www.unico.io/platforms/security-compliance
+  http_status: 200
+  self_service: false
+  note: >-
+    A published certifications page rather than a gated trust portal — no document request
+    flow, no Vanta/Drata/SafeBase portal, and no downloadable SOC 2 report. Certifications are
+    named on the page; the evidence behind them is obtained through "Talk to Sales".
+certifications:
+- SOC 2 Type 2
+- GDPR
+- ISO/IEC 42001
+- iBeta Level 1 (Presentation Attack Detection)
+- iBeta Level 2 (Presentation Attack Detection)
+- BixeLab Level 1 (Presentation Attack Detection)
+- BixeLab Level 2 (Presentation Attack Detection)
+- BixeLab Level 3 (Presentation Attack Detection)
+- BixeLab Injection Attack Detection
+- Tested by NIST (face recognition)
+infrastructure:
+  cloud: Google Cloud Platform
+  posture: multicloud, high availability, horizontal scalability
+  stated_volume: 150M+ transactions per month
+  source: https://www.unico.io/platforms/security-compliance
+related:
+  ethics_and_compliance: https://www.unico.io/ethics-and-compliance
+  privacy_policy: https://devcenter.unico.io/privacy/usa/policies/privacy-policy
+  cookies_policy: https://devcenter.unico.io/privacy/usa/policies/cookies-policy
+  website_policy: https://devcenter.unico.io/privacy/usa/policies/website-policy
+  status_page: https://status.unico.io
+  vulnerability_disclosure: security/unico-vulnerability-disclosure.yml

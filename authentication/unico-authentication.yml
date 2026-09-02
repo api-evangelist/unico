@@ -1,0 +1,91 @@
+generated: '2026-09-02'
+method: searched
+source: https://developer.unico.io/developers/api-reference/authentication
+docs: https://developer.unico.io/developers/api-reference/authentication
+note: >-
+  Unico publishes no OpenAPI, so this profile is read from the published Authentication and
+  Environments reference pages plus the live OpenID Connect discovery document served at
+  https://identity.acesso.io/.well-known/openid-configuration (HTTP 200, 2026-09-02).
+  identity.acesso.io is Unico's own token host: the Environments page names it as the
+  production OAuth2 endpoint for every IDCloud contract.
+security_schemes:
+- name: unico_oauth2_jwt_bearer
+  type: oauth2
+  flow: urn:ietf:params:oauth:grant-type:jwt-bearer
+  rfc: RFC 7523 (JWT Profile for OAuth 2.0 Client Authentication and Authorization Grants)
+  token_endpoint_production: https://identity.acesso.io/oauth2/token
+  token_endpoint_sandbox: https://identityhomolog.acesso.io/oauth2/token
+  authorization_endpoint: https://identity.acesso.io/oauth2/authorize
+  introspection_endpoint: https://identity.acesso.io/api/oauth2/tokeninfo
+  jwks_uri: https://identity.acesso.io/.well-known/jwks.json
+  request_content_type: application/x-www-form-urlencoded
+  assertion_parameter: assertion
+  signing_algorithm: RS256
+  assertion_claims:
+  - claim: iss
+    value: <account_name>@<tenant_id>.iam.acesso.io
+  - claim: aud
+    value: environment identity URL (https://identity.acesso.io or https://identityhomolog.acesso.io)
+  - claim: scope
+    value: '*'
+  - claim: iat
+    value: unix timestamp at issue
+  - claim: exp
+    value: maximum iat + 3600
+  token_ttl_seconds: 3600
+  renewal_guidance: >-
+    Reuse the access token for its full 1-hour TTL; refresh proactively when ~10 minutes
+    remain. The rate-limits page explicitly calls out per-request token minting as a way to
+    exhaust the tenant budget.
+- name: unico_bearer
+  type: http
+  scheme: bearer
+  bearer_format: JWT
+  header: 'Authorization: Bearer <access_token>'
+  applies_to: all IDCloud contracts (Web & SDK, API)
+- name: unico_apikey
+  type: apiKey
+  in: header
+  header_name: APIKEY
+  applies_to: the API (TCA / Check.Integration) contract only
+  note: >-
+    The APIKEY is not a second credential so much as a capability selector — the provisioned
+    key decides which product (Onboarding, Transactional, Cardholder Verification) and which
+    capability recipe (flow) the tenant's process executes. Adding a capability requires the
+    key to be reissued.
+discovery:
+  openid_configuration: https://identity.acesso.io/.well-known/openid-configuration
+  http_status: 200
+  issuer: https://identity.acesso.io
+  grant_types_supported:
+  - authorization_code
+  - refresh_token
+  - client_credentials
+  - urn:ietf:params:oauth:grant-type:jwt-bearer
+  response_types_supported:
+  - code
+  subject_types_supported:
+  - public
+  id_token_signing_alg_values_supported:
+  - RS256
+  code_challenge_methods_supported:
+  - S256
+  token_endpoint_auth_methods_supported:
+  - client_secret_basic
+  - client_secret_post
+  - none
+  - urn:ietf:params:oauth:client-assertion-type:jwt-bearer
+credential_separation:
+  environments_share_no_credentials: true
+  note: >-
+    Sandbox and production use different Client ID, private key and API key. Unico's own docs
+    name credential mixing as the most common cause of 401.
+common_failures:
+- symptom: HTTP 401
+  causes:
+  - incorrect or mismatched RSA private key
+  - aud claim does not match the environment identity URL
+  - exp claim already past, or beyond iat + 3600
+  - signing algorithm other than RS256
+  - sandbox credentials sent to production (or the reverse)
+  - APIKEY header missing on the API contract

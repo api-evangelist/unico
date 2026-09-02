@@ -1,0 +1,84 @@
+generated: '2026-09-02'
+method: searched
+source: https://developer.unico.io/developers/sdks-and-tools/web/web-sdk/resources/release-notes
+scheme: semver
+platform_changelog_published: false
+platform_changelog_note: >-
+  There is NO changelog for the REST platform itself. Unico publishes dated release notes per
+  SDK, but nothing that records changes to the API contracts, the webhook payloads or the
+  result vocabularies — which is exactly where its breaking changes land (the Identity
+  Verification upgrade guide describes a response-semantics change delivered on the same v1
+  path, with no changelog entry to find it in).
+sdk_release_notes:
+- sdk: Web SDK
+  url: https://developer.unico.io/developers/sdks-and-tools/web/web-sdk/resources/release-notes
+  http_status: 200
+- sdk: Android SDK
+  url: https://developer.unico.io/developers/sdks-and-tools/android/resources/release-notes
+  http_status: 200
+- sdk: iOS SDK
+  url: https://developer.unico.io/developers/sdks-and-tools/ios/resources/release-notes
+  http_status: 200
+- sdk: Flutter SDK
+  url: https://developer.unico.io/developers/sdks-and-tools/flutter/resources/release-notes
+  http_status: 200
+rendering_note: >-
+  The release-notes pages render their version tables client-side; the Markdown export of each
+  page (developer.unico.io serves a .md twin of every page) returns only the heading and the
+  semver best-practice note, with no entries. The dated version history below is therefore
+  read from the package registries Unico publishes to, which carry the same releases with
+  authoritative dates.
+entries_source: registry metadata (registry.npmjs.org, pub.dev, trunk.cocoapods.org)
+current_versions:
+  web_sdk: 3.27.0
+  android_sdk: 6.10.0
+  ios_sdk: 3.1.0
+  flutter_sdk: 4.58.0
+entries:
+- component: Web SDK (unico-webframe)
+  version: 3.27.0
+  date: '2026-08-31'
+  type: minor
+- component: Web SDK (unico-webframe)
+  version: 3.26.2
+  date: '2026-08-13'
+  type: patch
+- component: Web SDK (unico-webframe)
+  version: 3.26.0
+  date: '2026-07-16'
+  type: minor
+- component: Web SDK (unico-webframe)
+  version: 3.25.0
+  date: '2026-06-30'
+  type: minor
+- component: Flutter SDK (unico_check)
+  version: 4.58.0
+  date: '2026-08-19'
+  type: minor
+- component: Flutter SDK (unico_check)
+  version: 4.57.0
+  date: '2026-08-04'
+  type: minor
+- component: Flutter SDK (unico_check)
+  version: 4.56.0
+  date: '2026-07-23'
+  type: minor
+- component: iOS SDK (unicocheck-ios)
+  version: 3.1.0
+  date: '2026-08-18'
+  type: minor
+- component: iOS SDK (unicocheck-ios)
+  version: 3.0.4
+  date: '2026-07-23'
+  type: patch
+- component: iOS SDK (unicocheck-ios)
+  version: 3.0.3
+  date: '2026-07-16'
+  type: patch
+entry_count: 10
+breaking_changes_recorded: 0
+breaking_change_note: >-
+  Registry metadata carries no breaking/additive classification. The one documented breaking
+  change to the platform in the recent window is the Identity Verification result-vocabulary
+  change, published as a migration guide rather than as a changelog entry:
+  https://developer.unico.io/developers/api-reference/api/upgrade-guide

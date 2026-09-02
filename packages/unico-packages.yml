@@ -1,0 +1,118 @@
+generated: '2026-09-02'
+method: searched
+source: https://developer.unico.io/developers/sdks-and-tools/overview
+note: >-
+  Unico's client libraries are CAPTURE SDKs, not API clients. They open the camera, run
+  liveness and framing on-device, and hand back an encrypted payload; the REST call to
+  api.id.unico.app or api.idcloud.unico.app is still written by hand. There is no first-party
+  server-side SDK in any language — no Node, Python, Java, Go, .NET, PHP or Ruby client for
+  the IDCloud REST contracts exists on any registry. Versions and dates below were read from
+  each registry's own metadata endpoint on 2026-09-02.
+package_count: 4
+official_count: 4
+packages:
+- name: unico-webframe
+  registry: npm
+  url: https://www.npmjs.com/package/unico-webframe
+  official: true
+  version: 3.27.0
+  published: '2026-08-31'
+  first_published: '2021-03-04'
+  language: javascript
+  purpose: Web SDK — browser biometric capture frame (camera, computer vision, framing).
+  repository: https://github.com/acesso-io/unico-webframe
+  note: >-
+    Actively released — twelve releases in the six months to 2026-08-31. Maintainer accounts
+    are Unico staff (unico-sdk, unico-check, luiz.anjos.unico-io).
+- name: com.acesso:acessobio-android
+  registry: maven
+  url: https://maven-sdk.unico.run/sdk-mobile
+  official: true
+  version: 6.10.0
+  published: null
+  language: kotlin/java
+  purpose: Android capture SDK.
+  install: "implementation 'com.acesso:acessobio-android:6.10.0'"
+  repository_declaration: 'maven { url "https://maven-sdk.unico.run/sdk-mobile" }'
+  note: >-
+    NOT on Maven Central — Unico self-hosts the artifact repository at maven-sdk.unico.run.
+    The 6.10.0 POM returns HTTP 200 there, but the repository serves no maven-metadata.xml
+    (HTTP 200 carrying a JSON "Requested entity was not found" body), so there is no
+    machine-readable version index and no publish timestamp to read: `published: null` is
+    checked-and-absent, not unchecked. A consumer cannot discover the latest version
+    programmatically; they must read the docs page. The com.acesso group and acessobio-android
+    artifact name are legacy Acesso Digital branding, confirmed as current in Unico's own docs.
+- name: unicocheck-ios
+  registry: cocoapods
+  url: https://cocoapods.org/pods/unicocheck-ios
+  official: true
+  version: 3.1.0
+  published: '2026-08-18'
+  language: swift/objective-c
+  purpose: iOS capture SDK.
+  install: "pod 'unicocheck-ios'"
+  repository: https://github.com/acesso-io/unico-check-ios
+  alternate_distribution:
+    spm: '.package(url: "https://github.com/acesso-io/unico-check-ios.git", .upToNextMajor(from: "3.1.0"))'
+  note: >-
+    Also consumable via Swift Package Manager straight from the GitHub repo. Version and date
+    read from trunk.cocoapods.org.
+- name: unico_check
+  registry: pub.dev
+  url: https://pub.dev/packages/unico_check
+  official: true
+  version: 4.58.0
+  published: '2026-08-19'
+  language: dart
+  purpose: Flutter plugin wrapping the native Android and iOS capture SDKs.
+  homepage: https://developer.unico.io/developers/sdks-and-tools/flutter/requirements
+  note: Eight releases in the five months to 2026-08-19.
+server_side_sdks:
+  count: 0
+  note: >-
+    None published. Integrators call the REST contracts directly; Unico's substitute is the
+    three Postman collections in postman/ and the code samples on each operation page.
+not_first_party:
+- name: '@codespar/mcp-unico'
+  registry: npm
+  version: 0.2.0-alpha.3
+  published: '2026-06-22'
+  official: false
+  note: >-
+    Community MCP server for Unico published by codespar (maintainers codespar-npm,
+    dangazineu). No repository or homepage declared, alpha, and not referenced anywhere in
+    Unico's docs. Recorded for completeness; it is not a Unico-published surface.
+- name: expo-unico
+  registry: npm
+  version: 1.0.0
+  published: '2026-05-27'
+  official: false
+  note: Third-party Expo config plugin wrapping the Unico Check native module.
+- name: unico-js
+  registry: npm
+  official: false
+  note: >-
+    DIFFERENT COMPANY. Published by unico-it (github.com/unico-it), an unrelated Italian
+    organisation. Recorded here so a later pass does not mistake it for a Unico IDtech client.
+registries_checked:
+- registry: npm
+  found: true
+- registry: pub.dev
+  found: true
+- registry: cocoapods
+  found: true
+- registry: maven-central
+  found: false
+  note: 'group io.unico: 0 results; the Android SDK is self-hosted instead.'
+- registry: pypi
+  found: false
+- registry: nuget
+  found: false
+- registry: rubygems
+  found: false
+- registry: packagist
+  found: false
+- registry: crates.io
+  found: false
+- registry: pkg.go.dev
+  found: false

@@ -1,0 +1,77 @@
+generated: '2026-09-02'
+method: searched
+source: https://developer.unico.io/developers/api-reference/environments
+docs: https://developer.unico.io/developers/api-reference/environments
+sandbox_published: true
+model: separate environment (UAT / homolog), not a test-mode flag
+note: >-
+  Unico ships a full parallel environment rather than a test-mode key prefix. The contract is
+  identical — same endpoints, same payloads — and everything is separated at the credential
+  level. Self-service signup is not offered: sandbox credentials are provisioned by Unico's
+  Onboarding team as part of contracting, so an integrator cannot reach this environment
+  without a commercial relationship.
+environments:
+- name: sandbox
+  aliases: [UAT, homolog]
+  hosts:
+  - contract: OAuth2 / Token
+    host: https://identityhomolog.acesso.io
+  - contract: Web & SDK
+    host: https://api.idcloud.uat.unico.app
+  - contract: API
+    host: https://api.id.uat.unico.app
+  - contract: Magic Link (Mexico)
+    host: https://sandbox.trully.ai
+  real_biometric_data: false
+  persistence: periodically reset
+  webhook_delivery: real (to the integrator's sandbox endpoint)
+  rate_limits: lower than production
+- name: production
+  hosts:
+  - contract: OAuth2 / Token
+    host: https://identity.acesso.io
+  - contract: Web & SDK
+    host: https://api.idcloud.unico.app
+  - contract: API
+    host: https://api.id.unico.app
+  - contract: Magic Link (Mexico)
+    host: https://api.trully.ai
+  real_biometric_data: true
+  persistence: permanent
+credentials:
+  shared_across_environments: false
+  items: [Client ID, RSA private key, API key]
+  warning: >-
+    Documented verbatim as one of the most common causes of 401: sandbox credentials sent to
+    production, or the reverse.
+test_values_published:
+  test_cards: false
+  test_documents: false
+  test_selfies: false
+  test_cpf: false
+  note: >-
+    No published fixtures. Unico ships no test CPF, no sample selfie set and no canned
+    approve/deny identities — an integrator supplies their own images and works with the
+    Onboarding team. This is a meaningful gap for an agent: there is no way to exercise the
+    contract end-to-end from published material alone.
+time_simulation:
+  supported: false
+historical_simulation:
+  name: Backtests
+  supported: true
+  self_service: false
+  transport: SFTP
+  url: https://developer.unico.io/resources/backtests
+  note: >-
+    Historical simulation against past image data in an isolated environment. Access is
+    arranged through a sales representative or technical account manager, who issues SFTP
+    credentials and a host-key fingerprint. Not an API surface.
+console:
+  name: IDCloud portal / Unico Console
+  url: https://business.unico.io/
+  http_status: 403
+  http_status_note: >-
+    Cloudflare interactive challenge ("Just a moment...") answered our probe. The console
+    demonstrably exists — Unico's own site and product guide link to it — so this is an edge
+    policy, not a dead page.
+  guide: https://developer.unico.io/product-guide/portal-idcloud/

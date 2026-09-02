@@ -1,0 +1,171 @@
+generated: '2026-09-02'
+method: searched
+source: https://www.unico.io/platforms/security-compliance
+note: >-
+  Two kinds of row live here. The `standards` block records protocol conformance read from
+  the live contract surface (the OpenID Connect discovery document Unico serves and the
+  published Authentication reference). The `certifications` block records third-party
+  attestations Unico names on its own Certifications & Standards page. Nothing is inferred:
+  where Unico names a lab and a level but not the underlying ISO test, only the lab and level
+  are recorded.
+standards:
+- id: oauth2
+  name: OAuth 2.0 (RFC 6749)
+  conforms: true
+  evidence:
+    url: https://identity.acesso.io/.well-known/openid-configuration
+    http_status: 200
+    detail: >-
+      Live metadata declares authorization_endpoint, token_endpoint and
+      grant_types_supported [authorization_code, refresh_token, client_credentials,
+      urn:ietf:params:oauth:grant-type:jwt-bearer].
+- id: oidc
+  name: OpenID Connect Discovery 1.0
+  conforms: true
+  evidence:
+    url: https://identity.acesso.io/.well-known/openid-configuration
+    http_status: 200
+    detail: >-
+      A conformant discovery document is served at the canonical path, declaring issuer,
+      jwks_uri, subject_types_supported and id_token_signing_alg_values_supported [RS256].
+- id: rfc7523
+  name: JWT Profile for OAuth 2.0 Client Authentication and Authorization Grants (RFC 7523)
+  conforms: true
+  evidence:
+    url: https://developer.unico.io/developers/api-reference/authentication
+    detail: >-
+      The documented grant is urn:ietf:params:oauth:grant-type:jwt-bearer with an RS256-signed
+      assertion carrying iss/aud/scope/iat/exp, exchanged at /oauth2/token as
+      application/x-www-form-urlencoded. The discovery document lists the same grant type.
+- id: rfc7636
+  name: PKCE (RFC 7636)
+  conforms: true
+  evidence:
+    url: https://identity.acesso.io/.well-known/openid-configuration
+    http_status: 200
+    detail: code_challenge_methods_supported declares S256.
+- id: rfc7662
+  name: OAuth 2.0 Token Introspection (RFC 7662)
+  conforms: partial
+  evidence:
+    url: https://identity.acesso.io/.well-known/openid-configuration
+    http_status: 200
+    detail: >-
+      An introspection_endpoint is advertised at /api/oauth2/tokeninfo — a non-standard path,
+      and the endpoint's response shape is not documented publicly.
+- id: rfc9116
+  name: security.txt (RFC 9116)
+  conforms: true
+  evidence:
+    url: https://developer.unico.io/.well-known/security.txt
+    http_status: 200
+    detail: >-
+      Contact, Expires, Policy and Preferred-Languages fields present; also served on
+      api.id.unico.app and identity.acesso.io.
+- id: rfc9457
+  name: Problem Details for HTTP APIs (RFC 9457)
+  conforms: false
+  evidence:
+    url: https://developer.unico.io/developers/api-reference/error-codes
+    detail: >-
+      No application/problem+json media type and no type URI. Errors are an HTTP status plus a
+      free-form body.
+- id: idempotency
+  name: Idempotency keys on unsafe methods
+  conforms: false
+  evidence:
+    url: https://developer.unico.io/developers/api-reference/error-codes
+    detail: >-
+      Documented verbatim: "The IDCloud platform does not currently expose an idempotency-key
+      mechanism on creation endpoints."
+- id: pagination
+  name: Cursor or page-based pagination
+  conforms: false
+  evidence:
+    url: https://developer.unico.io/developers/api-reference/api/
+    detail: No list endpoint with pagination parameters is published.
+- id: openapi
+  name: OpenAPI Specification
+  conforms: false
+  evidence:
+    url: https://developer.unico.io/api/unico-api
+    http_status: 200
+    detail: >-
+      The developer portal ships an OpenAPI page whose body reads, verbatim, "Placeholder
+      OpenAPI specification." No machine-readable contract is served on any Unico host.
+- id: asyncapi
+  name: AsyncAPI
+  conforms: false
+  evidence:
+    url: https://developer.unico.io/developers/webhooks-and-events/
+    detail: A prose webhook reference is published; no AsyncAPI document exists.
+domain_standards:
+- id: iso-42001
+  name: ISO/IEC 42001 (AI management system)
+  conforms: claimed
+  evidence:
+    url: https://www.unico.io/platforms/security-compliance
+    detail: >-
+      Named on Unico's Certifications & Standards page under AI Governance. This is a domain
+      standard that matters for a biometric decisioning vendor — the buyer's question is
+      whether the model governance is externally audited.
+- id: nist-frte
+  name: NIST face recognition evaluation
+  conforms: claimed
+  evidence:
+    url: https://www.unico.io/platforms/security-compliance
+    detail: >-
+      Stated as "Tested by NIST" under Face Recognition. No FRTE/FRVT report identifier or
+      rank is published on the page, so this is recorded as a claim, not a verified placement.
+- id: presentation-attack-detection
+  name: Biometric presentation-attack detection testing
+  conforms: claimed
+  evidence:
+    url: https://www.unico.io/platforms/security-compliance
+    detail: >-
+      iBeta Level 1 and Level 2, and BixeLab Levels 1-3, are named for Presentation Attack
+      Detection. Unico does not name the underlying ISO/IEC 30107-3 test on this page, so only
+      the lab and level are recorded here.
+- id: injection-attack-detection
+  name: Biometric injection-attack detection testing
+  conforms: claimed
+  evidence:
+    url: https://www.unico.io/platforms/security-compliance
+    detail: BixeLab Injection Attack Detection (IAD) named under Biometric Security.
+certifications:
+- name: SOC 2 Type 2
+  category: infrastructure and operations
+  source: https://www.unico.io/platforms/security-compliance
+- name: GDPR
+  category: data protection
+  source: https://www.unico.io/platforms/security-compliance
+- name: ISO/IEC 42001
+  category: AI governance
+  source: https://www.unico.io/platforms/security-compliance
+- name: iBeta Level 1 (PAD)
+  category: biometric security
+  source: https://www.unico.io/platforms/security-compliance
+- name: iBeta Level 2 (PAD)
+  category: biometric security
+  source: https://www.unico.io/platforms/security-compliance
+- name: BixeLab Level 1 (PAD)
+  category: biometric security
+  source: https://www.unico.io/platforms/security-compliance
+- name: BixeLab Level 2 (PAD)
+  category: biometric security
+  source: https://www.unico.io/platforms/security-compliance
+- name: BixeLab Level 3 (PAD)
+  category: biometric security
+  source: https://www.unico.io/platforms/security-compliance
+- name: BixeLab Injection Attack Detection
+  category: biometric security
+  source: https://www.unico.io/platforms/security-compliance
+- name: Tested by NIST (face recognition)
+  category: biometric accuracy
+  source: https://www.unico.io/platforms/security-compliance
+vulnerability_disclosure:
+  program: HackerOne (public)
+  url: https://hackerone.com/unico_idtech
+  policy_basis: ISO 29147
+  contact: mailto:gestaodevulnerabilidades@unico.io
+  source: https://developer.unico.io/.well-known/security.txt

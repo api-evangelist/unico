@@ -1,0 +1,142 @@
+generated: '2026-09-02'
+method: derived
+status: candidate
+source: https://developer.unico.io/developers/api-reference/api/
+note: >-
+  Unico ships NO first-party MCP server. The tools[] below are a candidate mapping derived
+  from the operations Unico documents in its public API reference — they describe what an MCP
+  server for IDCloud would expose, not something an agent can call today. Input schemas are
+  read from the documented request tables, not from a spec: Unico publishes no OpenAPI.
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: unknown
+  verified: probed
+search_result:
+  official_server: none
+  probes:
+  - url: https://mcp.unico.io/mcp
+    method: POST tools/list
+    status: 0
+    note: host does not resolve (NXDOMAIN)
+  - url: https://api.id.unico.app/mcp
+    method: POST tools/list
+    status: 404
+  - url: https://developer.unico.io/mcp
+    method: POST tools/list
+    status: 400
+    note: static-hosting error document, not an MCP endpoint
+  - url: https://devcenter.unico.io/mcp
+    method: POST tools/list
+    status: 405
+    note: GitBook rejects the method; not an MCP endpoint
+  docs_mentions_mcp: false
+  docs_note: >-
+    developer.unico.io's whole 184-URL sitemap was walked. There is one agent-facing page —
+    "AI Agent Integration" (/developers/llms) — and what it documents is Markdown twins of
+    every docs page (append .md to any URL), NOT an MCP server. That page also cites
+    docs.unico.io as the example host, which does not resolve; the working host is
+    developer.unico.io.
+third_party:
+- name: '@codespar/mcp-unico'
+  registry: npm
+  version: 0.2.0-alpha.3
+  published: '2026-06-22'
+  author: codespar (maintainers codespar-npm, dangazineu)
+  scope: >-
+    Claims IDCloud, IDPay, IDCheck and Sign coverage — CPF/CNPJ, document OCR, face match,
+    liveness, PEP/watchlists, processes, webhooks, Unico Score.
+  first_party: false
+  mode: local-stdio
+  note: >-
+    Community-built, alpha, no declared repository or homepage, and referenced nowhere in
+    Unico's documentation. Recorded for completeness only; it is not a provider-published
+    agent surface and does not count as one.
+tools:
+- name: create_process
+  description: >-
+    Create an identity verification process by sending a captured selfie directly. Returns the
+    verdict synchronously.
+  rest:
+    method: POST
+    path: /processes/v1
+    host: https://api.id.unico.app
+  inputs: [subject.duiType, subject.code, subject.name, subject.gender, subject.birthDate,
+    subject.email, subject.phone, subject.clientReference, useCase, subsidiaryId, imageBase64]
+  confidence: high
+  source: https://developer.unico.io/developers/api-reference/api/post-processes
+  caution: >-
+    Non-idempotent and non-reversible. See conventions/unico-conventions.yml — there is no
+    idempotency key and no cancel operation, so a retried call creates a second billable
+    verification against a real person.
+- name: get_process
+  description: Retrieve an existing API-contract process by its identifier.
+  rest:
+    method: GET
+    path: /processes/v1/{id}
+    host: https://api.id.unico.app
+  inputs: [id]
+  confidence: high
+  source: https://developer.unico.io/developers/api-reference/api/get-process
+- name: get_reusable_documents
+  description: >-
+    Check whether a user already has a reusable document on file before starting a new capture.
+  rest:
+    method: GET
+    path: /documents
+    host: https://api.id.unico.app
+  confidence: medium
+  source: https://developer.unico.io/developers/api-reference/api/get-document
+- name: create_document_process
+  description: Capture a new document, or reuse a previously captured one, linked to a biometric process.
+  rest:
+    method: POST
+    path: /processes/document
+    host: https://api.id.unico.app
+  confidence: medium
+  source: https://developer.unico.io/developers/api-reference/api/post-processes-document
+- name: verify_data
+  description: >-
+    Query registration data, PEP/AML screening and sports relationship for a given CPF.
+    Brazil only.
+  rest:
+    method: GET
+    path: /lists
+    host: https://api.id.unico.app
+  confidence: medium
+  source: https://developer.unico.io/developers/api-reference/api/get-lists
+- name: verify_age
+  description: Age verification process.
+  rest:
+    method: POST
+    path: /processes/age-validation
+    host: https://api.id.unico.app
+  confidence: medium
+  source: https://developer.unico.io/developers/api-reference/api/post-processes-age-validation
+- name: create_journey
+  description: >-
+    Create a Unico-hosted verification journey (Web & SDK contract) and receive the
+    userRedirectUrl the end user is sent to.
+  rest:
+    method: POST
+    path: /client/v1/process
+    host: https://api.idcloud.unico.app
+  confidence: high
+  source: https://developer.unico.io/developers/api-reference/web-sdk
+- name: get_journey_result
+  description: Retrieve the result of a hosted-journey process.
+  rest:
+    method: GET
+    path: /client/v1/process/{id}
+    host: https://api.idcloud.unico.app
+  confidence: high
+  source: https://developer.unico.io/developers/api-reference/web-sdk
+tool_count: 8
+agent_readiness_note: >-
+  The blocker for an agent here is not the missing MCP server — it is that the platform
+  publishes no machine-readable contract at all, has no idempotency key, has no reversal
+  operation, and carries its verification verdict in a 200 body under a field name that
+  differs per contract. Any MCP server built on this, first-party or not, has to encode those
+  four facts by hand.

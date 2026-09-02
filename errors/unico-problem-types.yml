@@ -1,0 +1,128 @@
+generated: '2026-09-02'
+method: searched
+source: https://developer.unico.io/developers/api-reference/error-codes
+docs: https://developer.unico.io/developers/api-reference/error-codes
+format: vendor
+rfc9457: false
+note: >-
+  Unico publishes a single cross-contract error reference rather than an RFC 9457
+  problem+json catalogue. There is no `type` URI, no `application/problem+json` media type,
+  and no machine-readable error code registry — the documented shape is an HTTP status plus a
+  free-form body naming the offending fields. Derived from that page, not from a spec:
+  Unico publishes no OpenAPI.
+error_count: 10
+errors:
+- status: 200
+  title: OK
+  meaning: Request succeeded. Platform completed the work.
+  applies_to: all contracts
+  caution: >-
+    A 200 does NOT mean the person passed verification. The decision lives in the body.
+- status: 201
+  title: Created
+  meaning: Resource created. Rare — most creations return 200.
+  applies_to: API contract
+- status: 400
+  title: Bad Request
+  meaning: Payload is malformed or required fields are missing.
+  remediation: Read the body; it identifies the problematic fields. Do not retry unchanged.
+  applies_to: all contracts
+- status: 401
+  title: Unauthorized
+  meaning: Authentication missing, expired, or invalid.
+  remediation: >-
+    Refresh the access token once. If the retry also 401s the cause is structural — check the
+    signing key, the aud claim, RS256, environment credential mixing, and the APIKEY header.
+  applies_to: all contracts
+  known_codes:
+  - code: 1.2.21
+    message: Authentication failed
+    cause: assertion signed with the wrong private key
+- status: 403
+  title: Forbidden
+  meaning: Authentication is valid but the tenant lacks access to the requested capability.
+  remediation: The capability must be enabled on the contract and the API key reissued.
+  applies_to: Web & SDK, API
+- status: 404
+  title: Not Found
+  meaning: Resource does not exist or is not visible to the authenticated tenant.
+  applies_to: all contracts
+- status: 409
+  title: Conflict
+  meaning: >-
+    Resource exists but is not in the right state for this operation — e.g. fetching documents
+    from a process still in progress.
+  applies_to: Web & SDK, API
+- status: 410
+  title: Gone
+  meaning: >-
+    The resource existed but was deleted under the retention policy, or the process exists but
+    ended in an error state.
+  applies_to: document fetch endpoints; API Get Process
+- status: 429
+  title: Too Many Requests
+  meaning: Rate limit exceeded.
+  remediation: Honor Retry-After; otherwise exponential backoff capped at 60s.
+  applies_to: all contracts
+- status: 5xx
+  title: Platform error
+  remediation: >-
+    Exponential backoff, cap at 5 attempts. If persistent, contact support with the response
+    body and timestamp.
+  applies_to: all contracts
+retry_policy:
+- status: 5xx
+  retry: true
+  strategy: exponential backoff 1s/2s/4s/8s, cap 5 attempts
+- status: 429
+  retry: true
+  strategy: honor Retry-After, else exponential backoff
+- status: 401
+  retry: conditional
+  strategy: refresh the token once; a second 401 is structural, do not retry
+- status: 4xx (other)
+  retry: false
+  strategy: fix the input first
+soft_failures:
+  note: >-
+    The most important error semantics in this API are NOT HTTP statuses. A completed process
+    returns 200 and carries the verification verdict in the body under a different field per
+    contract. An agent that branches on status code alone will treat every rejection as a
+    success.
+  fields:
+  - field: process.result
+    negative_value: PROCESS_RESULT_FAILED
+    contract: Web & SDK
+  - field: process.authenticationInfo.livenessResult
+    negative_value: 'NO'
+    contract: Web & SDK
+  - field: liveness
+    negative_value: '2'
+    contract: API
+  - field: unicoId.result
+    negative_value: 'no'
+    contract: API
+  - field: data.response.unico.result
+    negative_value: NOT_APPROVED
+    contract: Magic Link
+  decision_values:
+  - value: approved
+    meaning: Real person and validated identity.
+  - value: denied
+    meaning: Identity not validated, liveness failed, or extreme risk.
+  - value: critical-risk
+    meaning: Critical risk level identified.
+  - value: high-risk
+    meaning: High risk level identified.
+  - value: retry
+    meaning: Insufficient capture or score to evaluate; ask for a new capture.
+  - value: inconclusive
+    meaning: Not enough evidence for a verdict; route to manual review.
+  source: https://developer.unico.io/developers/api-reference/api/flows
+sdk_error_catalogs:
+  note: Device-side SDK errors are documented separately, per platform.
+  pages:
+  - https://developer.unico.io/developers/sdks-and-tools/web/web-sdk/error-handling
+  - https://developer.unico.io/developers/sdks-and-tools/android/error-handling
+  - https://developer.unico.io/developers/sdks-and-tools/ios/error-handling
+  - https://developer.unico.io/developers/sdks-and-tools/flutter/error-handling

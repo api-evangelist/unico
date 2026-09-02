@@ -1,0 +1,167 @@
+generated: '2026-09-02'
+method: derived
+source: https://developer.unico.io/developers/api-reference/api/post-processes
+note: >-
+  Derived from the request and response field tables Unico publishes on each operation page,
+  not from a schema — Unico publishes no OpenAPI or JSON Schema. Every entity and field below
+  is named verbatim in the docs; nothing is inferred.
+entities:
+- name: Process
+  description: >-
+    The central object. A single identity verification transaction. Created by POST
+    /processes/v1 (API contract) or POST /client/v1/process (Web & SDK contract) and read back
+    by the matching GET. Terminal once finished — no cancel, void or delete operation exists.
+  identifier: processId
+  identifier_format: uuid
+  fields:
+  - name: processId
+    type: string (uuid)
+  - name: state
+    type: enum
+    vocabulary: PROCESS_STATE_*
+  - name: result
+    type: enum
+    vocabulary: PROCESS_RESULT_* (Web & SDK) / approved|denied|critical-risk|high-risk|retry|inconclusive (idCloud.result)
+  - name: flow
+    type: string
+    description: The capability recipe executed, e.g. id, idtoken.
+  - name: useCase
+    type: string
+  - name: subsidiaryId
+    type: string
+- name: Subject
+  description: >-
+    The person being verified. Embedded in the process-creation request; identified by a
+    country-specific document type plus its value.
+  fields:
+  - name: duiType
+    type: integer | string enum
+    description: >-
+      Document type. 50+ values spanning BR CPF/CNPJ/passport, MX CURP/RFC, US SSN/passport/
+      driver's licence, AR DNI, NG NIN/BVN, CL RUN, EC NI, GT CUI, UY CI, ID NIK, TR TCKN,
+      CO NIT, PE RUC, CA SIN, DK CPR, GB NINO, PL PESEL, SE PNR, CH AHV, AT STNR, FI HETU,
+      BE NN, IT CF, NO Fodselsnummer, DE IdNr, NL BSN, PT NIF, FR SPI, IE PPSN, LU Matricule,
+      ES NIE/DNI, plus email and phone as identifier types.
+  - name: code
+    type: string
+    description: The identifier value, no dots or dashes.
+  - name: name
+    type: string
+  - name: gender
+    type: string
+    enum: [M, F]
+  - name: birthDate
+    type: string (ISO 8601 date)
+  - name: email
+    type: string
+  - name: phone
+    type: string (E.164)
+  - name: clientReference
+    type: string
+    max_length: 256
+    description: >-
+      The integrator's own unique identifier for the user. Required for Multi Accounts, and
+      the only correlation handle available for duplicate suppression.
+- name: Reference
+  description: >-
+    Input for 1:1 (face-to-face) validation in the Transactional product. Replaces the
+    deprecated referenceProcessId field.
+  fields:
+  - name: referenceType
+    type: enum
+    enum: [REFERENCE_TYPE_IMAGE_BASE64, REFERENCE_TYPE_PROCESS_ID]
+  - name: referenceContent
+    type: string
+    description: Base64 image, or the UUID of a prior process.
+- name: Card
+  description: >-
+    Payment-card identity input for Cardholder Verification (IDPay). No selfie is captured for
+    this product — it runs entirely back-end.
+  fields:
+  - name: bin
+    type: string
+    description: First 6 or 8 digits. Required together with last4.
+  - name: last4
+    type: string
+  - name: name
+    type: string
+- name: Document
+  description: >-
+    A captured or reused identity document linked to a process. Fetched through a dedicated
+    endpoint; returns 410 Gone once retention has expired.
+  fields:
+  - name: documentType
+    type: string
+    description: e.g. RG, CNH (Brazil), with OCR-extracted fields.
+- name: Image
+  description: The biometric capture itself.
+  constraints:
+    minimum_resolution: 640x480
+    maximum_size: 800KB
+    formats: [PNG, JPEG, WebP]
+    recommended_compression: JPEG92
+    sdk_token_ttl: 10 minutes, single use
+- name: WebhookNotification
+  description: Terminal-state notification delivered to the integrator's endpoint.
+  fields:
+  - name: processId
+    type: string (uuid)
+  - name: state
+    type: enum
+  - name: flow
+    type: string
+  - name: lastEvent
+    type: enum
+    conditional: only when the process expired before completion
+  - name: lastEventDescription
+    type: string
+    conditional: only when the process expired before completion
+relationships:
+- from: Process
+  to: Subject
+  type: has_one
+  via: subject / person
+- from: Process
+  to: Image
+  type: has_one
+  via: imageBase64
+- from: Process
+  to: Reference
+  type: has_many
+  via: references[]
+- from: Process
+  to: Card
+  type: has_one
+  via: card
+- from: Process
+  to: Document
+  type: has_many
+  via: services[].documents[]
+- from: Process
+  to: Process
+  type: belongs_to
+  via: references[].referenceContent (REFERENCE_TYPE_PROCESS_ID) / referenceProcessId (deprecated)
+  note: >-
+    A Transactional or Cardholder Verification process points back at a prior approved
+    Onboarding process. This self-reference is what makes reuse and 1:1 comparison possible.
+- from: WebhookNotification
+  to: Process
+  type: belongs_to
+  via: processId
+identifier_conventions:
+  process_id: UUID v4, e.g. 8263a268-5388-492a-bca2-28e1ff4a69f0
+  no_prefixes: >-
+    Unico uses bare UUIDs with no type prefix, so an identifier carries no information about
+    which object or which contract it belongs to.
+result_vocabularies:
+  warning: >-
+    Three prefixed enum families exist and Unico states they are NOT interchangeable:
+    PROCESS_STATE_* (webhook state), PROCESS_RESULT_* (GetProcess result/status), and
+    EVENT_TYPE_* (webhook lastEvent).
+  source: https://developer.unico.io/developers/webhooks-and-events/event-types
+sources:
+- https://developer.unico.io/developers/api-reference/api/post-processes
+- https://developer.unico.io/developers/api-reference/api/get-process
+- https://developer.unico.io/developers/api-reference/api/flows
+- https://developer.unico.io/developers/api-reference/
+- https://developer.unico.io/developers/webhooks-and-events/event-types

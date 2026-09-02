@@ -1,0 +1,72 @@
+generated: '2026-09-02'
+method: searched
+source: https://developer.unico.io/developers/api-reference/rate-limits
+docs: https://developer.unico.io/developers/api-reference/rate-limits
+limit_count: 2
+rate_limits:
+- id: tenant-default-rps
+  scope: per-tenant
+  window: 1s
+  limit: 10
+  unit: requests
+  burst: null
+  configurable: true
+  note: >-
+    "The default value is 10 RPS per tenant." Exact limits are configured per tenant; Unico
+    directs integrators to their Onboarding team to confirm the applied ceiling and to request
+    an increase BEFORE volume rises.
+  source: https://developer.unico.io/developers/api-reference/rate-limits
+- id: webhook-concurrency
+  scope: per-webhook-endpoint
+  window: concurrent
+  limit: 500
+  unit: in-flight deliveries
+  burst: null
+  configurable: true
+  note: >-
+    Maximum simultaneous in-flight webhook deliveries, set when the webhook is registered.
+    Beyond it Unico queues deliveries. Distinct from the request budget: this one throttles
+    Unico calling the integrator.
+  source: https://developer.unico.io/developers/webhooks-and-events/security
+response_headers:
+- header: Retry-After
+  on_status: 429
+  units: seconds
+  required_behavior: honor it
+  observed: documented
+  example: 'Retry-After: 12'
+- header: X-RateLimit-Limit
+  present: false
+- header: X-RateLimit-Remaining
+  present: false
+- header: X-RateLimit-Reset
+  present: false
+- header: RateLimit
+  present: false
+exhaustion:
+  status_code: 429
+  reason_phrase: Too Many Requests
+  fallback_when_header_absent: >-
+    Exponential backoff 1s, 2s, 4s, 8s ... capped at 60s.
+concurrency:
+  note: >-
+    Separate from the per-second budget, the platform enforces infrastructure-level
+    concurrency caps. Unico's guidance is to target a steady RPS rather than bursting the
+    whole minute's budget into one second.
+adaptive_throttling:
+  applies_to: webhook delivery
+  behavior: >-
+    Sustained non-2xx responses from an integrator's webhook endpoint cause Unico to
+    automatically reduce throughput to that endpoint. Returning 503 during planned maintenance
+    triggers it; Unico advises stopping intake at the load balancer instead.
+  source: https://developer.unico.io/developers/webhooks-and-events/security
+polling_guidance:
+  note: >-
+    Unico explicitly names polling GET /client/v1/process/{id} as the fastest way to exhaust
+    the tenant budget and directs integrators to subscribe to the PROCESS_STATE_FINISHED
+    webhook instead. Token minting per request is called out the same way — cache the
+    access token for its full 1-hour TTL.
+observed_live: false
+observed_note: >-
+  Every documented endpoint requires an authenticated Bearer token, so no unauthenticated
+  live response was available to read headers from. Values above are documented, not probed.

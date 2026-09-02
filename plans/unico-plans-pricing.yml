@@ -1,0 +1,30 @@
+generated: '2026-09-02'
+method: searched
+source: https://www.unico.io/
+plan_count: 0
+pricing_page_published: false
+note: >-
+  Unico publishes no pricing. https://www.unico.io/pricing returns HTTP 404 and no pricing,
+  plans or packaging page appears anywhere in the site navigation or in the 184-URL
+  developer.unico.io sitemap. Every commercial path on the site is a "Talk to Sales" or
+  "Request demo" form, and the developer docs reinforce it: rate limits, enabled capabilities
+  and even sandbox credentials are all described as things the Onboarding team configures per
+  tenant. This is enterprise contract pricing, recorded as a documented zero rather than an
+  omission.
+plans: []
+commercial_model:
+  motion: sales-led
+  unit_hint: per verification / per transaction (implied by the per-tenant TPS and RPS
+    agreements described in the reprocessing guide; no rate card is published)
+  contact:
+  - https://www.unico.io/contact-us
+  evidence:
+  - url: https://www.unico.io/pricing
+    status: 404
+  - url: https://www.unico.io/contact-us
+    status: 200
+  - url: https://developer.unico.io/resources/reprocessing
+    status: 200
+    detail: >-
+      "The project will follow formal TPS (transactions per second) agreements" and "The
+      client must have an active contract or NDA signed with Unico."
