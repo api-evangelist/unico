@@ -108,6 +108,9 @@ apis:
   baseURL: https://identity.acesso.io
   tags:
   - Authentication
+  - OpenID Connect
+  tags_raw:
+  - Authentication
   - OAuth
   - OpenID Connect
   properties:
