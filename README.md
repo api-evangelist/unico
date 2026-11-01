@@ -64,5 +64,137 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-Unico is a company surfaced via the API Evangelist harvest backlog (source: secondary-market) and added to the network as a stub for full-pipeline profiling.
-- https://www.hiive.com/securities/unico-stock
+Unico (unico IDtech) is a Brazilian identity-technology company whose IDCloud platform performs facial-biometric identity verification, liveness detection, document capture and OCR, and fraud-risk decisioning for customer onboarding, step-up authentication and card-not-present payment verification. Founded out of Acesso Digital and headquartered in Sao Paulo with offices in Mexico City, Londrina and Menlo Park, it has raised roughly $338M across four rounds and states it processes 150M+ transactions per month on Google Cloud. Its public developer surface is two REST contracts — an API contract where the integrator owns the camera and sends the selfie in the request, and a Web & SDK contract where Unico hosts the whole verification journey — plus an outbound webhook, four native capture SDKs, and three published Postman collections. It publishes no OpenAPI: the developer portal's own OpenAPI page reads "Placeholder OpenAPI specification."
+
+**Areas:** Identity Verification · Biometrics · Facial Recognition · Liveness Detection · KYC · Fraud Prevention · Onboarding · Authentication · AML · Age Verification · Document Verification · Identity
+
+## Unico on APIs.io
+
+Everything profiled for Unico is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/unico/](https://apis.io/providers/unico/)** — or go straight to one of the APIs or properties below.
+
+### APIs (3)
+
+- [Unico IDCloud API](https://apis.io/apis/unico/idcloud-api/) — The API contract (internally TCA / Check.Integration) — used when the integrator's own application owns the biometric capture and sends the image directly…
+- [Unico IDCloud Web & SDK API](https://apis.io/apis/unico/idcloud-web-sdk/) — The Web & SDK contract — used when Unico hosts the verification journey. The process is created before capture; the response carries a userRedirectUrl the…
+- [Unico Identity OAuth2](https://apis.io/apis/unico/identity-oauth2/) — The OAuth2 token service every IDCloud contract authenticates against. Implements the RFC 7523 JWT-bearer grant with an RS256-signed assertion exchanged for…
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### AsyncAPI (1)
+
+Event-driven and webhook contracts.
+
+- [Unico Webhooks](https://apis.io/asyncapis/unico/unico-webhooks/)
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [unico-mcp.yml](https://apis.io/servers/unico/unico-mcp-yml/)
+
+#### Collections (3)
+
+Postman and Open Collection request collections.
+
+- [To Share](https://apis.io/collections/unico/postman-unico-api-integration/)
+- [unico - Authentication - Oauth2](https://apis.io/collections/unico/postman-unico-oauth2/)
+- [Plataforma Unico](https://apis.io/collections/unico/postman-unico-web-sdk-integration/)
+
+#### Security (4)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Unico Authentication](https://apis.io/security/unico/unico-authentication/)
+- [Unico Domain Security](https://apis.io/security/unico/unico-domain-security/)
+- [Unico Trust Center](https://apis.io/security/unico/unico-trust-center/)
+- [Unico Vulnerability Disclosure](https://apis.io/security/unico/unico-vulnerability-disclosure/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [Unico Scopes](https://apis.io/scopes/unico/unico-scopes/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Unico Plans Pricing](https://apis.io/plans/unico/unico-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Unico Rate Limits](https://apis.io/rate-limits/unico/unico-rate-limits/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
+
+- [Website](https://www.unico.io)
+- [Documentation](https://developer.unico.io/developers/api-reference/)
+- [Getting started](https://developer.unico.io/developers/api-reference/authentication)
+- [API reference](https://developer.unico.io/developers/api-reference/api/)
+- [Support](https://www.unico.io/contact-us)
+- [Blog](https://www.unico.io/blogs)
+- [Terms of service](https://devcenter.unico.io/privacy/usa/policies/website-policy)
+- [Privacy policy](https://devcenter.unico.io/privacy/usa/policies/privacy-policy)
+- [GitHub](https://github.com/unico-id)
+- [Status](https://status.unico.io)
+
+## API Evangelist rating
+
+**Kin Score 57.1** — strong · rubric 0.25.0 · scored 2026-10-23
+
+| Facet | Score |
+|---|---|
+| Discoverability | 78.6 |
+| Contract quality | 39.0 |
+| Contract governance | 18.2 |
+| Operational transparency | 73.7 |
+| Developer ergonomics | 76.2 |
+| Access clarity | 43.4 |
+
+**Agent readiness 33.5** — agent-ready
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | yes |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | served (partial credit) |
+| Idempotency | — |
+| Error Semantics | documented (partial credit) |
+| OpenAPI Examples | — |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | yes |
+| Agent Skills | — |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | served (partial credit) |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+| Pagination Ratio | na |
+| Operation Distinctiveness | na |
+
+**Regulatory alignment 43.4** — AI & Biometrics
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/unico/](https://apis.io/providers/unico/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for Unico: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/unico/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
